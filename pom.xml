@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- 统一版本管理,编译配置 -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.3.2</version>
+		<!-- <relativePath/> 表示"不要在本地文件系统找父 POM，去仓库找" -->
+		<relativePath/>
+	</parent>
+	<groupId>com.iot</groupId>
+	<artifactId>iot-data-platform</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>iot-data-platform</name>
+	<description>IoT Data Platform</description>
+
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+
+	<!-- 名字带 starter 的不是单个 jar，而是一捆 jar 的打包,starter 本质是 POM 不是 jar -->
+	<dependencies>
+		<!-- Spring Web: REST API -->
+		<!-- Web 层 — 对外提供 REST API -->
+		<!-- 内置 Tomcat 服务器 + Spring MVC + JSON 序列化(Jackson) -->
+		<!-- spring-webmvc — 请求路由核心 -->
+		<!-- spring-web — HTTP 底层支持，提供请求/响应对象封装 -->
+		<!-- tomcat-embed-core — 内嵌 Tomcat -->
+		<!-- jackson-databind — JSON 自动转换 -->
+		<!-- spring-boot + autoconfigure — 自动配置魔法 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- Spring Data Redis: 缓存集成 -->
+		<!-- 缓存层 — 高速读写缓存 -->
+		<!-- 连 Redis，做热点数据缓存，减轻数据库压力 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- Spring AOP: 日志切面 -->
+		<!-- 横切层 — 日志切面（贯穿所有层） -->
+		<!-- AOP 面向切面编程，用注解就能给方法自动加日志，不用每个方法手写 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<!-- 数据层 — 存取 MySQL 数据 -->
+		<!-- 驱动负责连数据库，MyBatis-Plus 负责把 SQL 映射成 Java 对象 -->
+		<!-- MySQL Driver -->
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<!-- Maven 的 scope 决定依赖在什么阶段可用 -->
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- MyBatis-Plus for Spring Boot 3 -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+			<version>3.5.7</version>
+		</dependency>
+
+		<!-- Eclipse Paho MQTT Client -->
+		<!-- 消息层 — 接收 IoT 设备上报的数据 -->
+		<!-- MQTT 协议客户端，IoT 设备用 MQTT 推送数据，这个库负责接收 -->
+		<dependency>
+			<groupId>org.eclipse.paho</groupId>
+			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+
+		<!-- Lombok -->
+		<!-- 开发工具,自动生成 getter/setter/toString -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Test -->
+		<!-- 测试工具, JUnit + MockMvc 等测试框架-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!--
+	 在 mvn package 执行完后，这个插件的 repackage 目标会二次加工那个 jar：
+	1.原来 target 目录下有个"瘦 jar"——重命名为 .jar.original 后缀
+	新建一个"胖 jar"——把你代码 + 所有 compile/runtime 依赖全部塞进去
+	胖 jar 里还加了一个特殊的启动器（org.springframework.boot.loader.JarLauncher），它负责在 java -jar 时找到 main 方法、加载内部依赖、启动内置 Tomcat
+	 -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

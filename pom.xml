@@ -10,6 +10,7 @@
 		<!-- <relativePath/> 表示"不要在本地文件系统找父 POM，去仓库找" -->
 		<relativePath/>
 	</parent>
+
 	<groupId>com.iot</groupId>
 	<artifactId>iot-data-platform</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -62,6 +63,8 @@
 		</dependency>
 
 		<!-- MyBatis-Plus for Spring Boot 3 -->
+		<!-- ORM层 — 把数据库表映射成Java对象，自动CRUD，不用手写SQL -->
+		<!-- 为什么用boot3-starter？因为Spring Boot 3.x基于Spring 6 + Jakarta EE，旧版mybatis-plus-starter不兼容 -->
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>
@@ -82,6 +85,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<!-- optional=true: 不传递给依赖此项目的其他模块，因为lombok只在编译期起作用 -->
 			<optional>true</optional>
 		</dependency>
 
@@ -92,14 +96,20 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- JUnit Platform Launcher（IDEA 运行测试需要） -->
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
-	<!--
-	 在 mvn package 执行完后，这个插件的 repackage 目标会二次加工那个 jar：
-	1.原来 target 目录下有个"瘦 jar"——重命名为 .jar.original 后缀
-	新建一个"胖 jar"——把你代码 + 所有 compile/runtime 依赖全部塞进去
-	胖 jar 里还加了一个特殊的启动器（org.springframework.boot.loader.JarLauncher），它负责在 java -jar 时找到 main 方法、加载内部依赖、启动内置 Tomcat
-	 -->
+
+
+	<!-- 1.原来 target 目录下有个"瘦 jar"——重命名为 .jar.original 后缀 -->
+	<!-- 2.新建一个"胖 jar"——把你代码 + 所有依赖全部塞进去 -->
 	<build>
 		<plugins>
 			<plugin>

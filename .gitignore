@@ -32,6 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### Custom ###
-application.yml
-application.yaml
+### Paho MQTT 离线缓存（每次启动生成新目录，不进仓库） ###
+iot-backend-*-tcplocalhost1883/

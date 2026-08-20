@@ -1,0 +1,47 @@
+# 服务器端口
+server:
+  port: 8080
+
+# 数据源配置
+spring:
+  datasource:
+    # 连接地址：本机 3306 端口，数据库 iot_db，问号后面是参数
+    #useUnicode=true&characterEncoding=utf-8 — 用 UTF-8 编码，防中文乱码
+    url: jdbc:mysql://localhost:3306/iot_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: ${DB_PASSWORD}
+    # JDBC 驱动类全限定名
+    # 约定大于配置：driver-class-name 其实可以不写。Spring Boot 看到 url 里有 mysql，会自动推断驱动类。但写上更明确。
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Redis 配置
+  data:
+    redis:
+      # 约定大于配置：这两个值不写也行。Spring Boot 的 Redis 默认就是 localhost:6379。写出来是为了明确。
+      host: localhost
+      port: 6379
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    # 把 SQL 语句打印到控制台（开发期用，生产关掉）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 数据库 user_name → Java userName 自动映射
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      #主键用数据库自增
+      id-type: auto
+
+# DeepSeek API 配置
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY}
+  api-url: https://api.deepseek.com/v1/chat/completions
+  model: deepseek-chat
+
+# MQTT配置
+mqtt:
+  broker-url: tcp://localhost:1883
+  client-id: iot-backend-${random.uuid}
+  topic: device/+/data
+  qos: 1

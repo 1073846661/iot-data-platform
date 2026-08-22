@@ -1,5 +1,6 @@
 package com.iot.platform.controller;
 
+import com.iot.platform.annotation.Log;
 import com.iot.platform.entity.DeviceData;
 import com.iot.platform.mqtt.MqttClientManager;
 import com.iot.platform.service.DeviceDataCacheService;
@@ -34,6 +35,7 @@ public class DeviceDataController {
 
     //GET /device/latest?limit=10 - 查最新N条
     @GetMapping("/latest")
+    @Log
     public List<DeviceData> latest(@RequestParam(defaultValue = "10") int limit){
         return deviceDataService.listLatest(limit);
     }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.platform.config.MqttConfig;
 import com.iot.platform.entity.DeviceData;
+import com.iot.platform.service.AlertService;
+import com.iot.platform.service.DeviceDataService;
 import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ public class MqttClientManager implements MqttCallback, InitializingBean {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private DeviceDataService deviceDataService;
+
+    @Autowired
+    private AlertService alertService;
 
 
     public boolean publish(String topic, String payload){
@@ -71,6 +79,8 @@ public class MqttClientManager implements MqttCallback, InitializingBean {
                     + ", 温度=" + data.getTemperature()
                     + ", 湿度=" + data.getHumidity()
                     + ", 接收时间=" + data.getReceivedAt());
+            deviceDataService.save(data);
+            alertService.checkAndAlert(data);
         } catch (JsonProcessingException e) {
             System.out.println("[MQTT 坏消息] 已丢弃，原因: " + e.getMessage());
         }

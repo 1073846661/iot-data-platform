@@ -1,7 +1,9 @@
 package com.iot.platform.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 @ConfigurationProperties(prefix = "deepseek")
@@ -32,5 +34,10 @@ public class DeepSeekConfig {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 }

@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class NL2SQLService {
@@ -69,6 +72,10 @@ public class NL2SQLService {
             //  往下找：choices 是数组 → 取第0个 → 里面的 message → 里面的 content
             String sql = root.path("choices").get(0).path("message").path("content").asText();
             sql = sql.replace("```sql", "").replace("```", "").trim();
+            int idx = sql.toLowerCase().indexOf("select");
+            if (idx > 0) {
+                sql = sql.substring(idx);
+            }
             return sql;
         }catch (JsonProcessingException e){
             throw new RuntimeException("解析DeepSeek响应失败", e);
@@ -77,5 +84,44 @@ public class NL2SQLService {
 
     public List<Map<String, Object>> executeSql(String sql) {
         return jdbcTemplate.queryForList(sql);
+    }
+
+    private void checkSelectOnly(String sql){
+        String cleaned = sql.trim().toLowerCase();
+        if (!cleaned.startsWith("select")){
+            throw new IllegalArgumentException("只允许SELECT查询");
+        }
+
+        String[] dangerous = {"insert", "update", "delete", "drop", "alter", "truncate"};
+        for (String keyword : dangerous){
+            if (cleaned.contains(keyword)){
+                throw new IllegalArgumentException("SQL包含禁止关键词: " + keyword);
+            }
+        }
+    }
+
+    private void checkTableWhiteList(String sql){
+        Set<String> allowed = Set.of("alert_record", "device_data");
+        Pattern p = Pattern.compile("(?i)(?:from|join)\\s+([a-z_][a-z0-9_]*)");
+        Matcher m = p.matcher(sql);
+        while (m.find()){
+            String table = m.group(1);
+            if (!allowed.contains(table)){
+                throw new IllegalArgumentException("不允许查询表: " + table);
+            }
+        }
+    }
+
+    private String appendLimit(String sql){
+        if (!sql.toLowerCase().contains("limit")){
+            return sql + " LIMIT 100";
+        }
+        return sql;
+    }
+
+    public String applyGuardrails(String sql){
+        checkSelectOnly(sql);
+        checkTableWhiteList(sql);
+        return appendLimit(sql);
     }
 }

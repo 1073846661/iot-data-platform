@@ -17,8 +17,9 @@ public class NL2SQLController {
 
     @PostMapping("/api/query")
     public Map<String, Object> query(@RequestBody Map<String, String> req){
-         String question = req.get("question");
+        String question = req.get("question");
         String sql = nl2SQLService.generateSql(question);
+        sql = nl2SQLService.applyGuardrails(sql);
         List<Map<String, Object>> data = nl2SQLService.executeSql(sql);
         Map<String, Object> result = new HashMap<>();
         result.put("question", question);

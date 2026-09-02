@@ -113,6 +113,10 @@ public class NL2SQLService {
     }
 
     private String appendLimit(String sql){
+        sql = sql.trim();
+        if (sql.endsWith(";")){
+            sql = sql.substring(0, sql.length() - 1).trim();
+        }
         if (!sql.toLowerCase().contains("limit")){
             return sql + " LIMIT 100";
         }

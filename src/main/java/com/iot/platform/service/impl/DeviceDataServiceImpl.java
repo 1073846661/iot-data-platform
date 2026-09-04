@@ -1,6 +1,7 @@
 package com.iot.platform.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.iot.platform.entity.DeviceData;
 import com.iot.platform.mapper.DeviceDataMapper;
@@ -19,6 +20,14 @@ public class DeviceDataServiceImpl extends ServiceImpl<DeviceDataMapper, DeviceD
         LambdaQueryWrapper<DeviceData> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(DeviceData::getReceivedAt).last("limit " + limit);
         return list(wrapper);
+    }
+
+    @Override
+    public Page<DeviceData> pageDeviceData(int current, int size, String deviceId) {
+        LambdaQueryWrapper<DeviceData> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(deviceId != null, DeviceData::getDeviceId, deviceId);
+        wrapper.orderByDesc(DeviceData::getReceivedAt);
+        return page(new Page<>(current, size), wrapper);
     }
 
     @Override

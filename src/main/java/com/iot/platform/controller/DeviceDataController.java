@@ -1,5 +1,6 @@
 package com.iot.platform.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.iot.platform.annotation.Log;
 import com.iot.platform.entity.DeviceData;
 import com.iot.platform.mqtt.MqttClientManager;
@@ -59,5 +60,11 @@ public class DeviceDataController {
     public boolean sendCmd(@PathVariable String deviceId, @RequestBody String cmd){
         String topic = "device/" + deviceId + "/cmd";
         return mqttClientManager.publish(topic, cmd);
+    }
+
+    @GetMapping("/page")
+    @Log
+    public Page<DeviceData> page(@RequestParam(defaultValue = "1") int current, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String deviceId){
+        return deviceDataService.pageDeviceData(current, size, deviceId);
     }
 }

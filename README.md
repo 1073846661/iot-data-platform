@@ -8,12 +8,13 @@
 
 ## 架构图
 
-![架构图](docs/architecture.svg)
+![架构图](docs/architecture.png)
 
 <!-- 图源文件说明：
-     - docs/architecture.svg    当前 README 使用这个（矢量图，颜色已固定）
-     - docs/architecture.drawio 可在 draw.io 里打开编辑；改完导出 PNG 后，
-                                把上面那行改成 ![](docs/architecture.png) 即可 -->
+     - docs/architecture.png    当前 README 使用这个（Python/Pillow 绘制，2x 清晰度，GitHub 渲染 100% 可靠）
+     - docs/architecture.svg    同内容矢量版（注：GitHub 文件页的"嵌入代码渲染"可能报 Invalid image source，
+                                但 README 内以图片方式引用不受影响——若遇渲染问题，用 png 即可）
+     - docs/architecture.drawio 可编辑源，能在 draw.io 里改（注意其"图形主题"会重新着色图形） -->
 
 
 ## 技术栈

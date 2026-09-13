@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 528" width="680" height="528" font-family="-apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif">
+  <title>iot-data-platform 系统架构</title>
+  <desc>五层架构：展示层浏览器看板、应用层 Spring Boot、消息层 MQTT Broker、设备层传感器，应用层右侧为存储层 MySQL 与 Redis</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="680" height="528" fill="#ffffff"/>
+
+  <rect x="40" y="40" width="400" height="80" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+  <text x="56" y="60" font-size="12" fill="#5F5E5A">展示层</text>
+  <text x="56" y="82" font-size="13" fill="#2C2C2A">浏览器监控看板（static/index.html）</text>
+  <text x="56" y="102" font-size="12" fill="#5F5E5A">分页表格 · 趋势图 · 命令下发 · 自然语言查询</text>
+
+  <line x1="240" y1="120" x2="240" y2="138" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="256" y="130" font-size="12" fill="#5F5E5A">HTTP / JSON</text>
+
+  <rect x="40" y="140" width="400" height="160" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="56" y="160" font-size="12" fill="#185FA5">应用层 · Spring Boot 3.3.2</text>
+  <text x="56" y="184" font-size="12" fill="#0C447C">MQTT 接入：订阅 device/+/data，发布 device/{id}/cmd</text>
+  <text x="56" y="208" font-size="12" fill="#0C447C">告警引擎：策略模式（AlertRule + 温度/湿度规则）</text>
+  <text x="56" y="232" font-size="12" fill="#0C447C">AOP 日志：@Log 注解 + @Around 切面</text>
+  <text x="56" y="256" font-size="12" fill="#0C447C">NL2SQL：DeepSeek API + 三层安全围栏</text>
+  <text x="56" y="280" font-size="12" fill="#0C447C">接口层：REST Controller + MyBatis-Plus 分页</text>
+
+  <line x1="440" y1="220" x2="458" y2="220" stroke="#185FA5" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+
+  <rect x="460" y="140" width="180" height="160" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="476" y="160" font-size="12" fill="#185FA5">存储层</text>
+  <text x="476" y="184" font-size="12" fill="#0C447C">MySQL 8</text>
+  <text x="476" y="204" font-size="12" fill="#185FA5">· device_data</text>
+  <text x="476" y="222" font-size="12" fill="#185FA5">· alert_record</text>
+  <text x="476" y="240" font-size="12" fill="#185FA5">· operation_log</text>
+  <text x="476" y="266" font-size="12" fill="#0C447C">Redis</text>
+  <text x="476" y="284" font-size="12" fill="#185FA5">· 热点数据缓存</text>
+
+  <line x1="240" y1="300" x2="240" y2="338" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="256" y="312" font-size="12" fill="#5F5E5A">上行 device/+/data</text>
+  <text x="256" y="330" font-size="12" fill="#5F5E5A">下行 device/{id}/cmd</text>
+
+  <rect x="40" y="340" width="400" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+  <text x="56" y="362" font-size="12" fill="#5F5E5A">消息层 · MQTT Broker</text>
+  <text x="56" y="384" font-size="13" fill="#2C2C2A">mosquitto :1883（Docker 容器 mosquitto-learn）</text>
+
+  <line x1="240" y1="404" x2="240" y2="422" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="256" y="414" font-size="12" fill="#5F5E5A">MQTT</text>
+
+  <rect x="40" y="424" width="400" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+  <text x="56" y="446" font-size="12" fill="#5F5E5A">设备层</text>
+  <text x="56" y="468" font-size="13" fill="#2C2C2A">传感器 / MQTTX 模拟设备（上报数据 · 接收命令）</text>
+</svg>

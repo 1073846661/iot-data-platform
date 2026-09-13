@@ -58,13 +58,15 @@ public class DeviceDataController {
 
     @PostMapping("/{deviceId}/cmd")
     public boolean sendCmd(@PathVariable String deviceId, @RequestBody String cmd){
-        String topic = "device/" + deviceId + "/cmd";
-        return mqttClientManager.publish(topic, cmd);
+        String topic = "device/" + deviceId + "/cmd";   //拼出目标主题
+        return mqttClientManager.publish(topic, cmd);   //交给MQTT客户端发布
     }
 
     @GetMapping("/page")
     @Log
-    public Page<DeviceData> page(@RequestParam(defaultValue = "1") int current, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String deviceId){
+    public Page<DeviceData> page(@RequestParam(defaultValue = "1") int current,
+                                 @RequestParam(defaultValue = "10") int size,
+                                 @RequestParam(required = false) String deviceId){
         return deviceDataService.pageDeviceData(current, size, deviceId);
     }
 }

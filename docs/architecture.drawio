@@ -1,0 +1,37 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="JnuXDV62teHHvEf2b_B2" name="第 1 页">
+    <mxGraphModel dx="1022" dy="660" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="light-dark(#FFFFFF,#CCCCCC)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="b1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc99;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=12;strokeColor=#36393d;" value="展示层&#xa;浏览器监控看板（static/index.html）&#xa;分页表格 · 趋势图 · 命令下发 · 自然语言查询" vertex="1">
+          <mxGeometry height="80" width="440" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#36393d;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=12;" value="应用层 · Spring Boot 3.3.2&#xa;MQTT 接入：订阅 device/+/data，发布 device/{id}/cmd&#xa;告警引擎：策略模式（AlertRule + 温度/湿度规则）&#xa;AOP 日志：@Log 注解 + @Around 切面&#xa;NL2SQL：DeepSeek API + 三层安全围栏&#xa;接口层：REST Controller + MyBatis-Plus 分页" vertex="1">
+          <mxGeometry height="170" width="440" x="60" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#36393d;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=12;" value="存储层&#xa;MySQL 8&#xa;· device_data&#xa;· alert_record&#xa;· operation_log&#xa;Redis&#xa;· 热点数据缓存" vertex="1">
+          <mxGeometry height="170" width="200" x="560" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc99;strokeColor=#36393d;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=12;" value="消息层 · MQTT Broker&#xa;mosquitto :1883（Docker 容器 mosquitto-learn）" vertex="1">
+          <mxGeometry height="70" width="440" x="60" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc99;strokeColor=#36393d;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontSize=12;" value="设备层&#xa;传感器 / MQTTX 模拟设备（上报数据 · 接收命令）" vertex="1">
+          <mxGeometry height="70" width="440" x="60" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="b1" style="endArrow=classic;startArrow=classic;html=1;rounded=1;strokeColor=#5F5E5A;fontSize=11;fontColor=#444441;" target="b2" value="HTTP / JSON">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="b2" style="endArrow=classic;startArrow=classic;html=1;rounded=1;strokeColor=#185FA5;" target="b3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="b2" style="endArrow=classic;startArrow=classic;html=1;rounded=1;strokeColor=#5F5E5A;fontSize=11;fontColor=#444441;align=left;spacingLeft=8;" target="b4" value="上行 device/+/data&#xa;下行 device/{id}/cmd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="b4" style="endArrow=classic;startArrow=classic;html=1;rounded=1;strokeColor=#5F5E5A;fontSize=11;fontColor=#444441;" target="b5" value="MQTT">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

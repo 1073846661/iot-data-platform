@@ -33,11 +33,11 @@ public class MqttClientManager implements MqttCallback, InitializingBean {
     public boolean publish(String topic, String payload){
         try {
             MqttMessage message = new MqttMessage();
-            message.setPayload(payload.getBytes(StandardCharsets.UTF_8));
-            message.setQos(1);
-            mqttClient.publish(topic, message);
+            message.setPayload(payload.getBytes(StandardCharsets.UTF_8));   //字符串 → 字节
+            message.setQos(1);  //至少送达一次
+            mqttClient.publish(topic, message);     //发布到broker，不是直接发给设备
             System.out.println("[MQTT 已下发] topic=" + topic + ", payload=" + payload);
-            return true;
+            return true;    //失败时catch返回false
         } catch (MqttException e){
             System.out.println("[MQTT 下发失败] " + e.getMessage());
             return false;

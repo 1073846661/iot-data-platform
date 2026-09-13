@@ -25,9 +25,9 @@ public class DeviceDataServiceImpl extends ServiceImpl<DeviceDataMapper, DeviceD
     @Override
     public Page<DeviceData> pageDeviceData(int current, int size, String deviceId) {
         LambdaQueryWrapper<DeviceData> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(deviceId != null, DeviceData::getDeviceId, deviceId);
-        wrapper.orderByDesc(DeviceData::getReceivedAt);
-        return page(new Page<>(current, size), wrapper);
+        wrapper.eq(deviceId != null, DeviceData::getDeviceId, deviceId);    //条件重载：null就跳过
+        wrapper.orderByDesc(DeviceData::getReceivedAt);     //最新在前
+        return page(new Page<>(current, size), wrapper);    //分页拦截器
     }
 
     @Override

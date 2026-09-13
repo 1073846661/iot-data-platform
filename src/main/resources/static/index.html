@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="meIIwLvTrAxoB2UfqTNjFq">
+<head data-page-node-id="up1d0GGRgVE7aaQZWEUBVX">
+<meta charset="UTF-8" data-page-node-id="POBjLrVDVlHIIFy09pwE5r">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="wwsGp6diTAfZHPzjT6wDBP">
+<title>IoT 数据平台 · 监控看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b1220;
+    color: #dbe4f0;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  header {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 4px 8px 18px;
+  }
+  header h1 { font-size: 24px; color: #4fc3f7; letter-spacing: 2px; }
+  header .sub { font-size: 13px; color: #6b7c93; }
+  header .clock { margin-left: auto; font-size: 13px; color: #6b7c93; font-variant-numeric: tabular-nums; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+  .card {
+    background: #121c2e;
+    border: 1px solid #1e2d47;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  .card h2 {
+    font-size: 15px; color: #4fc3f7; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2::before {
+    content: ""; width: 4px; height: 14px; background: #4fc3f7; border-radius: 2px;
+  }
+  .card h2 .tag { margin-left: auto; font-size: 12px; color: #6b7c93; font-weight: normal; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 8px; text-align: left; border-bottom: 1px solid #1e2d47; white-space: nowrap; }
+  th { color: #6b7c93; font-weight: normal; }
+  td { color: #dbe4f0; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: #16233a; }
+  .temp-high { color: #ff6b6b; }
+  .temp-ok { color: #51cf66; }
+
+  #chart { width: 100%; height: 300px; }
+
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  input[type="text"] {
+    flex: 1; background: #0d1626; border: 1px solid #1e2d47; border-radius: 6px;
+    padding: 9px 12px; color: #dbe4f0; font-size: 14px; outline: none;
+  }
+  input[type="text"]:focus { border-color: #4fc3f7; }
+  button {
+    background: #1565c0; color: #fff; border: none; border-radius: 6px;
+    padding: 9px 20px; font-size: 14px; cursor: pointer; transition: background .2s;
+    white-space: nowrap;
+  }
+  button:hover { background: #1976d2; }
+  button:disabled { background: #2c3e55; cursor: not-allowed; }
+  .msg { font-size: 13px; min-height: 20px; margin-top: 4px; }
+  .msg.ok { color: #51cf66; }
+  .msg.err { color: #ff6b6b; }
+
+  .sql-box {
+    background: #0d1626; border: 1px solid #1e2d47; border-radius: 6px;
+    padding: 10px 12px; margin: 12px 0; font-family: Consolas, monospace;
+    font-size: 13px; color: #ffd54f; word-break: break-all; display: none;
+  }
+  .sql-box .label { color: #6b7c93; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; margin-right: 8px; }
+
+  .result-wrap { max-height: 260px; overflow: auto; display: none; }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+    border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .examples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .examples span {
+    font-size: 12px; color: #6b7c93; background: #0d1626; border: 1px solid #1e2d47;
+    padding: 4px 10px; border-radius: 12px; cursor: pointer;
+  }
+  .examples span:hover { color: #4fc3f7; border-color: #4fc3f7; }
+
+  .pager { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .pager button { padding: 6px 14px; font-size: 13px; }
+  .pager .page-info { flex: 1; text-align: center; font-size: 12px; color: #6b7c93; font-variant-numeric: tabular-nums; }
+  .btn-ghost { background: #0d1626; border: 1px solid #1e2d47; color: #6b7c93; }
+  .btn-ghost:hover { background: #0d1626; color: #4fc3f7; border-color: #4fc3f7; }
+
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page-node-id="4fMA2GRYneGbNHVpChIE0p">
+
+<header data-page-node-id="jSjwMGOtAgnM9sP5IthgRI">
+  <h1 data-page-node-id="Gh5azZcgaGolpPS3Zyyo69">IoT 数据平台</h1>
+  <span class="sub" data-page-node-id="PsPKzTGilk4gzK3RFIuvGA">设备温湿度监控看板</span>
+  <span class="clock" id="clock" data-page-node-id="qhS4UAgClOsDx9GhzZ8sFZ"></span>
+</header>
+
+<div class="grid" data-page-node-id="ANCpD0YyAE1q5guFv7JUqi">
+
+  <!-- 模块1：实时数据表格 -->
+  <div class="card" data-page-node-id="igZkpZMbErMXZh2igKMGW6">
+    <h2 data-page-node-id="HncRC3FzUfTEFCpmyqtrXH">实时数据 <span class="tag" id="latestTag" data-page-node-id="WtHBAWuS9F5NEnYIJ0hNjz">每 5 秒自动刷新</span></h2>
+    <div class="form-row">
+      <input type="text" id="filterDevice" placeholder="按设备 ID 筛选，如 dev001">
+      <button id="filterBtn" onclick="applyFilter()">筛选</button>
+      <button id="clearBtn" class="btn-ghost" onclick="clearFilter()">清除</button>
+    </div>
+    <table data-page-node-id="hb9iHNXlXNbt1ZBXeWItNw">
+      <thead data-page-node-id="6AKXs659flQ4BqHRJTLZmZ">
+        <tr data-page-node-id="eG8kT3BEK2e51qS06ZHFsc"><th data-page-node-id="CeIXxFFYkt1DnRsXVKYyhb">ID</th><th data-page-node-id="JY38RPJuMhwrAZJ7ttPHsO">设备</th><th data-page-node-id="NCtvn47OmTIyi7tEABQwlu">温度(℃)</th><th data-page-node-id="JKw9EYjcnZFPK8yt2yEhZ8">湿度(%)</th><th data-page-node-id="5fssfQGb6sPtOJae2WAYzd">上报时间</th></tr>
+      </thead>
+      <tbody id="latestBody" data-page-node-id="7GWsCpVdxJSeJZxqfUCm2T">
+        <tr data-page-node-id="fRKFbBxzLQNr06HdYnbpk3"><td colspan="5" style="color:#6b7c93" data-page-node-id="DWLWOWchrGLjz2sR9NLcBV">加载中...</td></tr>
+      </tbody>
+    </table>
+    <div class="pager">
+      <button id="prevBtn" onclick="gotoPage(pageState.current - 1)">上一页</button>
+      <span class="page-info" id="pageInfo">第 1 / 1 页 · 共 0 条</span>
+      <button id="nextBtn" onclick="gotoPage(pageState.current + 1)">下一页</button>
+    </div>
+  </div>
+
+  <!-- 模块2：温湿度趋势图 -->
+  <div class="card" data-page-node-id="xNH3CqByC1FNVvMWAInvmW">
+    <h2 data-page-node-id="zla5wPPsZEpOVByHBvH0dO">温湿度趋势 <span class="tag" data-page-node-id="s1Sz2SirRHlhP2BnnT43lh">最近 20 条</span></h2>
+    <div id="chart" data-page-node-id="lDMOyzTNy4NA6prOWmtWtZ"></div>
+  </div>
+
+  <!-- 模块3：命令下发 -->
+  <div class="card" data-page-node-id="JnsMBEBhlKJ2orqfThBP8Z">
+    <h2 data-page-node-id="mBD3TUGtbArwotKfrEt6Ot">命令下发</h2>
+    <div class="form-row" data-page-node-id="1VE2E9E8SVGDP023yYxiwJ">
+      <input type="text" id="cmdDevice" placeholder="设备 ID，如 dev001" data-page-node-id="TSgfdl18HYRaieKYSKW21m">
+    </div>
+    <div class="form-row" data-page-node-id="cl7B2pLUpilVEb6nV02UTz">
+      <input type="text" id="cmdContent" placeholder="命令内容，如 reboot" data-page-node-id="xmf0DCT0PwWcmdCuWaIVN8">
+      <button id="cmdBtn" onclick="sendCmd()" data-page-node-id="KuS4X2EuueKmbfEvRhoFFy">发送</button>
+    </div>
+    <div class="msg" id="cmdMsg" data-page-node-id="m5Vhsm5uJWnPQTRKBoUkrc"></div>
+  </div>
+
+  <!-- 模块4：自然语言查询 -->
+  <div class="card" data-page-node-id="cKW1FHfl6nZgEGKIHQId8q">
+    <h2 data-page-node-id="AjgGc7IYyipG0azE790rm5">自然语言查询 <span class="tag" data-page-node-id="6V3eUCORbamq6aewMXoWS6">DeepSeek NL2SQL</span></h2>
+    <div class="form-row" data-page-node-id="oq2tlsPXDPuTTG5dQJeNEO">
+      <input type="text" id="nlQuestion" placeholder="用中文提问，如：查一下 dev001 最近的温度" data-page-node-id="UMyDbSuh6SZvTEvqRyBS6C">
+      <button id="nlBtn" onclick="askNL()" data-page-node-id="k6pNQxEuosGZiHMEOmS7nY">查询</button>
+    </div>
+    <div class="examples" data-page-node-id="FGETy5B8G929DxJ4oPftg0">
+      <span onclick="fillQ(this)" data-page-node-id="4Ufe8bAFfCwcU3aLtTw5CF">查一下 dev001 最近的温度</span>
+      <span onclick="fillQ(this)" data-page-node-id="YrBIijeGZ566QBhhCegZO6">所有设备的平均湿度</span>
+      <span onclick="fillQ(this)" data-page-node-id="wSH2VHvbYZaKv2c6Fo2usb">温度最高的 5 条记录</span>
+    </div>
+    <div class="sql-box" id="sqlBox" data-page-node-id="fUMuhEJCrZzOvmsCUafX5t"><span class="label" data-page-node-id="ic558NJRr4SYdXf9s1a7KY">生成 SQL</span><span id="sqlText" data-page-node-id="a5FfAZ3sqn9vt9NThKMOat"></span></div>
+    <div class="result-wrap" id="resultWrap" data-page-node-id="Tccc3t7C0doK1s7DLt6aCp">
+      <table data-page-node-id="ImZFlbbwDve5tAB29BvgK5">
+        <thead id="resultHead" data-page-node-id="GkZoExatAEAun4NqhCA3ME"></thead>
+        <tbody id="resultBody" data-page-node-id="LG5QJ8kHaRzxGigJQTcNVu"></tbody>
+      </table>
+    </div>
+    <div class="msg" id="nlMsg" data-page-node-id="e9T7GDhdHL214Z0MdqhDL7"></div>
+  </div>
+
+</div>
+
+<script>
+/* ========== 工具：HTML 转义（所有后端数据渲染到 innerHTML 前必须过一遍） ========== */
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ========== 顶部时钟 ========== */
+function tickClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleString('zh-CN', { hour12: false });
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ========== 模块1：实时数据表格（分页 + 设备筛选） ========== */
+const PAGE_SIZE = 10; // 每页条数固定 10
+const pageState = { current: 1, pages: 1, total: 0, deviceId: '' };
+
+async function loadTable() {
+  try {
+    let url = '/device/page?current=' + pageState.current + '&size=' + PAGE_SIZE;
+    if (pageState.deviceId) url += '&deviceId=' + encodeURIComponent(pageState.deviceId);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const page = await res.json();
+    pageState.current = page.current || 1;
+    pageState.pages = page.pages || 0;
+    pageState.total = page.total || 0;
+
+    const list = page.records || [];
+    const tbody = document.getElementById('latestBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:#6b7c93">暂无数据</td></tr>';
+    } else {
+      tbody.innerHTML = list.map(d => `
+      <tr>
+        <td>${esc(d.id)}</td>
+        <td>${esc(d.deviceId)}</td>
+        <td class="${d.temperature >= 30 ? 'temp-high' : 'temp-ok'}">${esc(d.temperature)}</td>
+        <td>${esc(d.humidity)}</td>
+        <td>${esc(formatTime(d.receivedAt))}</td>
+      </tr>`).join('');
+    }
+
+    // 页码信息 + 翻页按钮置灰规则
+    document.getElementById('pageInfo').textContent = pageState.pages === 0
+      ? `共 ${pageState.total} 条`
+      : `第 ${pageState.current} / ${pageState.pages} 页 · 共 ${pageState.total} 条`;
+    document.getElementById('prevBtn').disabled = pageState.current <= 1; //第1页不能再往前
+    document.getElementById('nextBtn').disabled = pageState.pages === 0 || pageState.current >= pageState.pages;
+    updateRefreshTag();
+  } catch (e) {
+    console.error('加载实时数据失败', e);
+  }
+}
+
+// 只有「第 1 页且无筛选」才允许自动刷新，翻页或筛选即暂停
+function isAutoRefreshOn() {
+  return pageState.current === 1 && !pageState.deviceId;
+}
+function updateRefreshTag() {
+  document.getElementById('latestTag').textContent = isAutoRefreshOn() ? '每 5 秒自动刷新' : '已暂停自动刷新';
+}
+
+function gotoPage(p) {
+  if (p < 1 || (pageState.pages > 0 && p > pageState.pages)) return;
+  pageState.current = p;
+  loadTable();
+}
+
+function applyFilter() {
+  pageState.deviceId = document.getElementById('filterDevice').value.trim();
+  pageState.current = 1; // 筛选后回到第 1 页
+  loadTable();
+}
+
+function clearFilter() {
+  document.getElementById('filterDevice').value = '';
+  pageState.deviceId = '';
+  pageState.current = 1; // 清除后恢复全部设备第 1 页
+  loadTable();
+}
+
+function formatTime(t) {
+  if (!t) return '';
+  // 后端可能返回 "2026-09-11T14:30:00" 或时间戳
+  const d = typeof t === 'number' ? new Date(t) : new Date(String(t).replace('T', ' '));
+  return isNaN(d) ? String(t) : d.toLocaleString('zh-CN', { hour12: false });
+}
+
+/* ========== 模块2：温湿度趋势图 ========== */
+const chart = echarts.init(document.getElementById('chart'), null, { renderer: 'canvas' });
+
+async function loadTrend() {
+  try {
+    // 取 20 条点画趋势，接口返回按时间倒序，画图前先 reverse 成正序
+    const res = await fetch('/device/page?current=1&size=20');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const page = await res.json();
+    const records = (page.records || []).slice().reverse();
+    chart.setOption({
+      backgroundColor: 'transparent',
+      grid: { left: 44, right: 44, top: 36, bottom: 40 },
+      tooltip: { trigger: 'axis', backgroundColor: '#1a2740', borderColor: '#1e2d47', textStyle: { color: '#dbe4f0' } },
+      legend: { data: ['温度(℃)', '湿度(%)'], textStyle: { color: '#6b7c93' }, top: 0 },
+      xAxis: {
+        type: 'category',
+        data: records.map(d => formatTime(d.receivedAt)),
+        axisLabel: { color: '#6b7c93', fontSize: 11, rotate: 30 },
+        axisLine: { lineStyle: { color: '#1e2d47' } }
+      },
+      yAxis: [
+        { type: 'value', name: '℃', nameTextStyle: { color: '#6b7c93' },
+          axisLabel: { color: '#6b7c93' }, splitLine: { lineStyle: { color: '#1e2d47' } } },
+        { type: 'value', name: '%', nameTextStyle: { color: '#6b7c93' },
+          axisLabel: { color: '#6b7c93' }, splitLine: { show: false } }
+      ],
+      series: [
+        { name: '温度(℃)', type: 'line', smooth: true, symbol: 'circle', symbolSize: 5,
+          data: records.map(d => d.temperature),
+          lineStyle: { color: '#ff6b6b', width: 2 }, itemStyle: { color: '#ff6b6b' },
+          areaStyle: { color: 'rgba(255,107,107,0.08)' } },
+        { name: '湿度(%)', type: 'line', smooth: true, symbol: 'circle', symbolSize: 5, yAxisIndex: 1,
+          data: records.map(d => d.humidity),
+          lineStyle: { color: '#4fc3f7', width: 2 }, itemStyle: { color: '#4fc3f7' },
+          areaStyle: { color: 'rgba(79,195,247,0.08)' } }
+      ]
+    });
+  } catch (e) {
+    console.error('加载趋势数据失败', e);
+  }
+}
+window.addEventListener('resize', () => chart.resize());
+
+/* ========== 模块3：命令下发 ========== */
+async function sendCmd() {
+  const deviceId = document.getElementById('cmdDevice').value.trim();
+  const content = document.getElementById('cmdContent').value.trim();
+  const msg = document.getElementById('cmdMsg');
+  const btn = document.getElementById('cmdBtn');
+  if (!deviceId || !content) {  //前端先校验空值
+    msg.className = 'msg err';
+    msg.textContent = '设备 ID 和命令内容都不能为空';
+    return;
+  }
+  btn.disabled = true;  //防连点
+  msg.className = 'msg';
+  msg.textContent = '发送中...';
+  try {
+    // 注意：Body 是 text/plain 纯文本，不是 JSON
+    const res = await fetch('/device/' + encodeURIComponent(deviceId) + '/cmd', {
+      method: 'POST',   //
+      headers: { 'Content-Type': 'text/plain' },  //声明“我发的是纯文本”
+      body: content   //请求体就是那个字符串
+    });
+    const text = await res.text();
+    msg.className = res.ok ? 'msg ok' : 'msg err';
+    msg.textContent = (res.ok ? '发送成功：' : '发送失败：') + (text || res.status);
+  } catch (e) {
+    msg.className = 'msg err';
+    msg.textContent = '请求异常：' + e.message;
+  } finally {
+    btn.disabled = false;   //无论成败都恢复按钮
+  }
+}
+
+/* ========== 模块4：自然语言查询 ========== */
+function fillQ(el) {
+  document.getElementById('nlQuestion').value = el.textContent;
+}
+
+async function askNL() {
+  const question = document.getElementById('nlQuestion').value.trim();
+  const btn = document.getElementById('nlBtn');
+  const msg = document.getElementById('nlMsg');
+  const sqlBox = document.getElementById('sqlBox');
+  const resultWrap = document.getElementById('resultWrap');
+  if (!question) {
+    msg.className = 'msg err';
+    msg.textContent = '请输入问题';
+    return;
+  }
+  // 大模型生成 SQL 需要几秒，必须给 loading
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 生成中';
+  msg.className = 'msg';
+  msg.textContent = '正在调用大模型生成 SQL，请稍候（约几秒）...';
+  sqlBox.style.display = 'none';
+  resultWrap.style.display = 'none';
+  try {
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: question })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const result = await res.json();
+
+    // 展示生成的 SQL（NL2SQL 能力必须可见，不做黑盒）
+    document.getElementById('sqlText').textContent = result.sql || '(无)';
+    sqlBox.style.display = 'block';
+
+    // 展示查询结果表格
+    const rows = result.data || [];
+    const thead = document.getElementById('resultHead');
+    const tbody = document.getElementById('resultBody');
+    if (rows.length) {
+      const cols = Object.keys(rows[0]);
+      thead.innerHTML = '<tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr>';
+      tbody.innerHTML = rows.map(r =>
+        '<tr>' + cols.map(c => `<td>${r[c] === null ? 'NULL' : esc(r[c])}</td>`).join('') + '</tr>'
+      ).join('');
+    } else {
+      thead.innerHTML = '';
+      tbody.innerHTML = '<tr><td style="color:#6b7c93">查询成功，但没有匹配的记录</td></tr>';
+    }
+    resultWrap.style.display = 'block';
+    msg.className = 'msg ok';
+    msg.textContent = `查询完成，共 ${rows.length} 条记录`;
+  } catch (e) {
+    msg.className = 'msg err';
+    msg.textContent = '查询失败：' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '查询';
+  }
+}
+
+// 回车快捷提交
+document.getElementById('nlQuestion').addEventListener('keydown', e => { if (e.key === 'Enter') askNL(); });
+document.getElementById('cmdContent').addEventListener('keydown', e => { if (e.key === 'Enter') sendCmd(); });
+document.getElementById('filterDevice').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilter(); });
+
+/* ========== 启动 & 定时刷新 ========== */
+loadTable();
+loadTrend();
+setInterval(() => { if (isAutoRefreshOn()) loadTable(); }, 5000); // 仅第 1 页且无筛选时才自动刷新
+setInterval(loadTrend, 15000);   // 趋势图每 15 秒刷新
+</script>
+</body>
+</html>

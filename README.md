@@ -144,7 +144,13 @@ docker start mosquitto-learn   # MQTT Broker，端口 1883
 docker start redis-learn       # Redis，端口 6379
 ```
 
-MySQL：启动本地 MySQL80 服务，确保存在数据库 `iot_db`（含 `device_data`、`alert_record`、`operation_log` 三张表）。
+MySQL：启动本地 MySQL80 服务。**首次运行**先建库建表——建表语句已版本化在仓库里：
+
+```bash
+mysql -u root -p < docs/schema.sql
+```
+
+该脚本创建数据库 `iot_db` 与三张表（`device_data`、`alert_record`、`operation_log`）及其索引，可重复执行。
 
 ### 2. 配置环境变量
 

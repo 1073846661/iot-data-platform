@@ -9,5 +9,5 @@ import java.util.List;
 public interface DeviceDataService extends IService<DeviceData> {
     //查最新N条数据（按时间倒序）
     List<DeviceData> listLatest(int limit);
-    Page<DeviceData> pageDeviceData(int current, int size, String deviceId);
+    Page<DeviceData> pageDeviceData(int current, int size, String deviceId, String startTime, String endTime);
 }

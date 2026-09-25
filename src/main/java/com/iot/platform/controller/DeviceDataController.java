@@ -66,7 +66,9 @@ public class DeviceDataController {
     @Log
     public Page<DeviceData> page(@RequestParam(defaultValue = "1") int current,
                                  @RequestParam(defaultValue = "10") int size,
-                                 @RequestParam(required = false) String deviceId){
-        return deviceDataService.pageDeviceData(current, size, deviceId);
+                                 @RequestParam(required = false) String deviceId,
+                                 @RequestParam(required = false) String startTime,
+                                 @RequestParam(required = false) String endTime){
+        return deviceDataService.pageDeviceData(current, size, deviceId, startTime, endTime);
     }
 }

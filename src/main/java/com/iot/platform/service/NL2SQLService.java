@@ -47,7 +47,7 @@ public class NL2SQLService {
 
     public String generateSql(String question) {
         Map<String, Object> body = new HashMap<>();
-        body.put("model", deepSeekConfig.getModel());   // "model": "deepseek-chat"
+        body.put("model", deepSeekConfig.getModel());   // 值来自 application.yaml 的 deepseek.model（2026-09-23：deepseek-flash）
 
         Map<String, String> systemMsg = new HashMap<>();
         systemMsg.put("role", "system");

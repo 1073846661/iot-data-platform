@@ -9,6 +9,7 @@ import com.iot.platform.service.DeviceDataService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -26,7 +27,8 @@ public class DeviceDataServiceImpl extends ServiceImpl<DeviceDataMapper, DeviceD
     public Page<DeviceData> pageDeviceData(int current, int size, String deviceId, String startTime, String endTime) {
         LambdaQueryWrapper<DeviceData> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(deviceId != null, DeviceData::getDeviceId, deviceId);    //条件重载：null就跳
-        wrapper.between(startTime != null && endTime != null, DeviceData::getReceivedAt, startTime, endTime);
+        wrapper.ge(StringUtils.hasText(startTime), DeviceData::getReceivedAt, startTime);  // 起始
+        wrapper.le(StringUtils.hasText(endTime),   DeviceData::getReceivedAt, endTime);    // 结束
         wrapper.orderByDesc(DeviceData::getReceivedAt);     //最新在前
         return page(new Page<>(current, size), wrapper);    //分页拦截器
     }
